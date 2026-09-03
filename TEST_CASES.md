@@ -13,6 +13,18 @@ live URL currently returns Apache `406 Not Acceptable` from the test
 environment, so live observations must be recorded as **Blocked** until access
 is restored.
 
+## Observed recording baseline
+
+The supplied recording loaded `https://ravenmetal.co.il/` at 958x683 with page
+title `מטאל זה אנחנו - Raven Metal`. It established these navigation facts:
+
+- `#accept-cookies-btn` / accessible name `אישור` accepts the cookie notice.
+- `לחצו כאן` opens `article_info.php?articles_id=44`.
+- `החשבון שלי` opens `login.php`.
+- `המשך` on the login flow opens `create_account.php`.
+
+The recording did not submit credentials, create an account, or reach payment.
+
 ## Manual cases
 
 | ID | Priority | Area | Preconditions | Steps | Expected result | Automation |
@@ -25,8 +37,8 @@ is restored.
 | MAN-006 | P0 | Totals | Shipping/tax rules are documented | Buy CD, vinyl, discounted item, and mixed cart; vary destination | Subtotal, discount, shipping, tax, currency, and grand total match rules exactly | Unit/API/E2E |
 | MAN-007 | P0 | Stock race | Product/event has stock of 1; two sessions available | Add/buy from two sessions concurrently and submit | At most one succeeds; loser gets a clear message; inventory is not negative | API/E2E |
 | MAN-008 | P1 | Checkout validation | Cart has a shippable item | Submit blank, malformed, overlong, Hebrew, and boundary address/contact fields | Inline errors identify fields; valid data is accepted; no data is lost unexpectedly | Component/E2E |
-| MAN-009 | P1 | Guest checkout | Cart has a physical item | Complete checkout as guest with valid data | Guest can pay if supported; confirmation includes order ID and delivery details | E2E |
-| MAN-010 | P1 | Account checkout | Registered test user exists | Sign in, checkout, sign out, and inspect order history | Correct user sees only their order; sensitive data is not exposed | E2E/API |
+| MAN-009 | P1 | Guest checkout | Cart has a physical item | Complete non-payment checkout fields and open payment page; stop | Guest checkout is available if supported; summary and payment handoff are correct; no payment is submitted | E2E |
+| MAN-010 | P1 | Login/logout | Login page is reachable; test account exists | Enter valid credentials, inspect account page, log out, then revisit account URL | Correct account opens; logout removes access; no credentials or private data leak | E2E |
 | MAN-011 | P0 | Payment boundary | Valid cart and checkout data | Complete checkout fields and open the payment page; stop | Correct total, order summary, and payment-page handoff are displayed; no payment is submitted | E2E |
 | MAN-012 | P0 | Payment error fixture | Approved mock/fixture exists | Trigger a mocked decline or provider error before submission; stop | Actionable error is shown; no real payment or order is created; cart remains usable | E2E/API mock |
 | MAN-013 | P0 | Payment interruption | Approved mock/fixture exists | Interrupt the mocked redirect or simulate timeout; stop | Recoverable state is clear; retry control does not submit a real payment | E2E/API mock |
@@ -41,6 +53,13 @@ is restored.
 | MAN-022 | P1 | Recovery | Order/payment flow started | Refresh, use browser back, lose network, restore network | User sees recoverable state; no duplicate order; cart/order status is truthful | E2E |
 | MAN-023 | P2 | Content/localization | Hebrew and accented data exist | Switch language if offered; inspect RTL text, dates, currency, and long titles | Direction, truncation, encoding, and formatting are correct | Visual/component |
 | MAN-024 | P1 | Refund/cancel | Approved non-payment order fixture exists | Request cancellation/refund within and outside allowed window | Policy is enforced; order/ticket/inventory states update consistently; otherwise mark Blocked | API fixture + manual |
+| MAN-025 | P1 | Cookie consent | Homepage is opened in a fresh browser context | Verify consent notice, accept `#accept-cookies-btn`, refresh, and inspect the notice | Notice is readable in Hebrew; it closes; preference persists according to policy; content remains usable | E2E |
+| MAN-026 | P1 | Article navigation | Homepage is open | Activate `לחצו כאן` and inspect the destination | Navigation reaches `article_info.php?articles_id=44`; page has meaningful content, title, back navigation, and no broken assets | E2E |
+| MAN-027 | P1 | Account navigation | Homepage is open | Activate `החשבון שלי` | Navigation reaches `login.php`; login form has labels, password masking, submit control, and registration path | E2E |
+| MAN-028 | P1 | Registration navigation | `login.php` is open | Activate the image control named `המשך` | Navigation reaches `create_account.php`; registration form is usable and does not expose an existing user's data | E2E |
+| MAN-029 | P1 | Registration validation | Registration page is open | Submit empty form; try invalid email, short/mismatched passwords, missing required fields, Hebrew, long text, and duplicate email | Field-level errors are clear; invalid data is rejected; entered values are retained safely; no account is created on failure | Component/E2E |
+| MAN-030 | P1 | Registration success | Approved disposable mailbox and test data exist | Complete registration without payment and attempt login with the new account | Account is created once; success message/email behavior matches requirements; credentials work only for the new account | E2E |
+| MAN-031 | P1 | Login edge cases | Login page is open | Try blank fields, invalid email, wrong password, repeated failures, leading/trailing spaces, back/refresh, and expired session | Safe, useful errors; no password disclosure; rate limiting/lockout follows policy; session state is correct | E2E/API |
 
 ## Automated cases
 
@@ -63,6 +82,10 @@ These are the first automation candidates. They should be tagged `smoke`,
 | AUTO-012 | compatibility | Run the smoke journey in the supported desktop and mobile browser projects. |
 | AUTO-013 | security | Attempt unauthorized order lookup and client-side price manipulation; assert server denial/recalculation. |
 | AUTO-014 | recovery | Simulate network failure before payment submission, retry the handoff, and assert no duplicate request or real charge. |
+| AUTO-015 | smoke | Open the homepage, accept `#accept-cookies-btn`, and assert the cookie notice closes. |
+| AUTO-016 | regression | Click `החשבון שלי` and assert URL `/login.php`; click the `המשך` image control and assert `/create_account.php`. |
+| AUTO-017 | regression | Validate registration required fields, invalid email, password mismatch, and duplicate-email fixture without creating a real account unless explicitly approved. |
+| AUTO-018 | regression | Validate login success with an isolated test account, logout, protected-page denial, and invalid-credential messaging. |
 
 ## Suggested automation skeleton
 
@@ -73,6 +96,7 @@ CSS classes or visible copy that frequently changes.
 ```ts
 test('checkout reaches payment without submitting', async ({ page }) => {
   await page.goto(process.env.SHOP_URL!);
+  await page.locator('#accept-cookies-btn').click();
   await page.getByTestId('search').fill('known-cd');
   await page.getByTestId('product-card').first().click();
   await page.getByRole('button', { name: /add to cart/i }).click();

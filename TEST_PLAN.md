@@ -20,6 +20,22 @@ are a designed test pack, not a report of verified live behavior. Re-run the
 discovery pass from an approved network or with site-owner access before
 converting assumptions into observed results.
 
+### Observed recording baseline from 2026-09-03
+
+The supplied browser recording successfully loaded the homepage at 958x683
+with title `מטאל זה אנחנו - Raven Metal`. It showed a Hebrew/RTL interface and
+these observed routes and controls:
+
+- Cookie consent: `#accept-cookies-btn`, accessible name `אישור`.
+- Homepage article link: accessible name `לחצו כאן`, navigating to
+  `article_info.php?articles_id=44`.
+- Account link: accessible name `החשבון שלי`, navigating to `login.php`.
+- Registration continuation: an image control with accessible name `המשך`,
+  navigating from login to `create_account.php`.
+
+These observations confirm navigation only. They do not confirm the content,
+validation rules, authentication result, inventory, or payment behavior.
+
 Before testing, record the answers in the test run:
 
 | Item | Value to confirm |
@@ -48,6 +64,7 @@ the product owner, and attach the answer to the test run.
 - Concert event details: venue, date/time, ticket price, availability, and limits.
 - Cart, quantity changes, removal, totals, shipping, tax, discounts, and mixed carts.
 - Guest checkout and registered-user checkout, if both are offered.
+- Login, logout, registration entry, account validation, and session behavior.
 - Address validation, order review, payment authorization, decline, timeout,
   cancellation, and 3DS redirect.
 - Payment-page boundary, confirmation behavior only when a non-payment fixture
