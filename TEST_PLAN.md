@@ -11,14 +11,15 @@ payment with a missing order is more urgent than a cosmetic alignment issue.
 
 ## 2. Assumptions and items to confirm
 
-### Access note from 2026-09-03
+### Access note from 2026-09-20
 
-The live URL `https://ravenmetal.co.il/` was requested from the test
-environment, but the server returned Apache `406 Not Acceptable`. The `www`
-host and HTTP variants returned the same response. Therefore the cases below
-are a designed test pack, not a report of verified live behavior. Re-run the
-discovery pass from an approved network or with site-owner access before
-converting assumptions into observed results.
+The live URL `https://ravenmetal.co.il/` was reachable from the test
+environment. The homepage title was `מטאל זה אנחנו - Raven Metal`, and the
+public catalog, product, article, login, registration, cart, policy, and
+accessibility routes were inspected. The automated suite covers only these
+non-transactional public paths. Checkout, payment, account creation, stock
+mutation, and fulfillment remain unverified until an approved QA environment
+and test fixtures are available.
 
 ### Observed recording baseline from 2026-09-03
 

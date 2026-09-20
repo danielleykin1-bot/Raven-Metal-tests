@@ -4,14 +4,16 @@
 
 `P0` is release-blocking, `P1` is high priority, and `P2` is lower risk.
 Each case has a manual procedure. The **Automation** column identifies the
-recommended automated layer; it is not a claim that automation already exists.
+recommended automated layer. Safe public navigation cases are implemented in
+`tests/site.spec.ts`; payment, order, stock, and account mutation cases remain
+manual or fixture-dependent.
 
 **Payment boundary:** Every case stops when the payment page is displayed.
 Do not enter card data, click a final payment button, or place an order. For
 payment-error behavior, use a site-owner-approved mock or fixture only. The
-live URL currently returns Apache `406 Not Acceptable` from the test
-environment, so live observations must be recorded as **Blocked** until access
-is restored.
+live URL was reachable on 2026-09-20. Public navigation was observed, but
+checkout, payment, stock mutation, and fulfillment must still be recorded as
+**Blocked** until an approved QA environment and fixtures are available.
 
 ## Observed recording baseline
 
