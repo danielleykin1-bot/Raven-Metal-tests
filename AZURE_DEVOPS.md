@@ -9,9 +9,25 @@ before the pipeline or Test Plan can be created.
 
 The requested organization URL `https://dev.azure.com/danielleykintests`
 returned Azure DevOps **404 - Page not found** when checked on 2026-09-29.
-This workspace also has no Azure DevOps MCP/API connection or authenticated
-Azure CLI. Therefore no cloud project, test plan, test suite, or Azure run has
-been created from this repository.
+Having a personal Microsoft/Azure account doesn't automatically create an
+Azure DevOps organization. This workspace also has no Azure DevOps MCP/API
+connection or authenticated Azure CLI. Therefore no cloud project, test plan,
+test suite, or Azure run has been created from this repository.
+
+## What the free account can do
+
+The free Azure DevOps tier can run Azure Pipelines and publish the JUnit
+results without an Azure Test Plans license. Microsoft-hosted parallel-job
+availability for a private project can require requesting/enabling the free
+tier; the current published allowance is one job, up to 60 minutes per run
+and 1,800 minutes per month.
+
+The **Test Plans** hub and its full plan/suite management features are a
+separate access level: **Basic + Test Plans** or an eligible Visual Studio
+subscription. Without that access, keep the test case definitions in this
+repository and use the Azure Pipeline **Tests** tab for results. The CSV
+import into a Test Plan requires the appropriate Test Plans access and
+permissions.
 
 The repository-side setup is ready:
 
@@ -26,14 +42,17 @@ The repository-side setup is ready:
 
 ## Required Azure access
 
-1. Sign in to [Azure DevOps](https://dev.azure.com/) with the account intended
-   for this work.
-2. Create or confirm the organization. Its exact URL should resolve to the
-   organization home rather than a 404.
+1. Sign in to [Azure DevOps](https://dev.azure.com/) with the personal account.
+2. If no organization exists, follow the Azure DevOps onboarding flow to create
+   one ([Microsoft's organization creation guide](https://learn.microsoft.com/azure/devops/organizations/accounts/create-organization?view=azure-devops)).
+   Select a unique organization name; the final URL is
+   `https://dev.azure.com/<organization-name>`. Confirm it opens the
+   organization rather than returning a 404.
 3. Create the project **Raven Metal Tests**. For importing and managing
    Test Plans, the user needs at least **Basic** access; creating and managing
-   plans/suites requires **Basic + Test Plans** or an eligible Visual Studio
-   subscription, along with the appropriate project permissions.
+   plans/suites requires [**Basic + Test Plans**](https://learn.microsoft.com/azure/devops/organizations/security/access-levels?view=azure-devops)
+   or an eligible Visual Studio subscription, along with the appropriate
+   project permissions.
 4. In the project, create a pipeline from the connected GitHub repository and
    select `azure-pipelines.yml`. Authorize the GitHub service connection when
    prompted.
