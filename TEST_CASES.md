@@ -65,8 +65,12 @@ The recording did not submit credentials, create an account, or reach payment.
 
 ## Automated cases
 
-These are the first automation candidates. They should be tagged `smoke`,
-`regression`, or `payment-sandbox` in the chosen framework.
+These are automation candidates; cases needing fixtures are not claimed as
+implemented. Playwright covers safe public paths in `tests/site.spec.ts`.
+Selenium in `selenium-tests/site.test.js` covers public navigation, cookie
+consent, a product detail page, registration-form structure, and the empty
+cart. Neither suite submits account forms, places orders, changes inventory,
+or submits payment.
 
 | ID | Tag | Automated scenario and assertions |
 |---|---|---|
