@@ -7,6 +7,7 @@
     "test:e2e:smoke": "playwright test --grep @smoke",
     "test:e2e:regression": "playwright test --grep @regression",
     "test:selenium": "node --test selenium-tests/*.test.js",
+    "test:selenium:ci": "node --test --test-reporter=junit --test-reporter-destination=test-results/selenium-junit.xml selenium-tests/*.test.js",
     "test:selenium:smoke": "node --test --test-name-pattern=@smoke selenium-tests/*.test.js",
     "test:selenium:regression": "node --test --test-name-pattern=@regression selenium-tests/*.test.js"
   },

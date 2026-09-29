@@ -1,0 +1,66 @@
+trigger:
+  branches:
+    include:
+      - main
+      - danielleykin1-bot-ravenmetal-test-cases
+
+pool:
+  vmImage: ubuntu-24.04
+
+variables:
+  # The current tests are read-only against the public site. Replace this
+  # pipeline variable with an approved QA URL when one is available.
+  SHOP_URL: https://ravenmetal.co.il
+
+steps:
+  - task: UseNode@1
+    displayName: Use Node.js 20
+    inputs:
+      version: 20.x
+
+  - script: npm ci
+    displayName: Install dependencies
+
+  - script: npx playwright install --with-deps chromium
+    displayName: Install Chromium and system dependencies
+
+  - script: |
+      mkdir -p test-results
+      CHROME_BIN="$(node --input-type=module -e "import { chromium } from '@playwright/test'; process.stdout.write(chromium.executablePath())")"
+      echo "##vso[task.setvariable variable=CHROME_BIN]$CHROME_BIN"
+    displayName: Configure Selenium browser binary
+
+  - script: npm run test:e2e
+    displayName: Run Playwright tests
+    condition: succeededOrFailed()
+    env:
+      SHOP_URL: $(SHOP_URL)
+
+  - task: PublishTestResults@2
+    displayName: Publish Playwright results
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: test-results/playwright-junit.xml
+      failTaskOnFailedTests: true
+      failTaskOnFailureToPublishResults: true
+      failTaskOnMissingResultsFile: true
+      testRunTitle: Playwright - Raven Metal
+
+  - script: npm run test:selenium:ci
+    displayName: Run Selenium tests
+    condition: succeededOrFailed()
+    env:
+      CHROME_BIN: $(CHROME_BIN)
+      SHOP_URL: $(SHOP_URL)
+
+  - task: PublishTestResults@2
+    displayName: Publish Selenium results
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: test-results/selenium-junit.xml
+      failTaskOnFailedTests: true
+      failTaskOnFailureToPublishResults: true
+      failTaskOnMissingResultsFile: true
+      testRunTitle: Selenium - Raven Metal

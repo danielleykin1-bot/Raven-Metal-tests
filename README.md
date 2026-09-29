@@ -12,6 +12,8 @@ vinyl records, and concert tickets.
 - [Selenium suite](selenium-tests/site.test.js): Selenium WebDriver smoke and regression coverage for safe public-site journeys.
 - [Selenium test plan](SELENIUM_TEST_PLAN.md): Selenium environment, coverage, execution, and maintenance guidance.
 - [Selenium test cases](SELENIUM_TEST_CASES.md): documented Selenium steps, expected outcomes, and fixture-dependent exclusions.
+- [Azure DevOps integration](AZURE_DEVOPS.md): pipeline setup, Test Plans case import, and automated-result association.
+- [Azure Test Plans import file](azure/test-cases.csv): Selenium cases in Azure DevOps CSV import format.
 
 ## Running Playwright tests
 

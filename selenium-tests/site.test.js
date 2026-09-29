@@ -15,7 +15,7 @@ describe('Raven Metal Selenium browser suite', () => {
       '--disable-dev-shm-usage',
       '--no-sandbox',
       '--window-size=1440,1000',
-    );
+    ).setPageLoadStrategy('eager');
 
     if (process.env.CHROME_BIN) {
       options.setChromeBinaryPath(process.env.CHROME_BIN);
@@ -38,7 +38,10 @@ describe('Raven Metal Selenium browser suite', () => {
   async function open(path) {
     await driver.get(`${baseUrl}${path}`);
     await driver.wait(
-      async () => (await driver.executeScript('return document.readyState')) === 'complete',
+      async () =>
+        ['interactive', 'complete'].includes(
+          await driver.executeScript('return document.readyState'),
+        ),
       timeout,
     );
   }
@@ -71,7 +74,7 @@ describe('Raven Metal Selenium browser suite', () => {
     );
   }
 
-  it('@smoke homepage displays the shop entry points', async () => {
+  it('[SEL-001] @smoke homepage displays the shop entry points', async () => {
     await open('/');
     await driver.wait(until.titleContains('Raven Metal'), timeout);
 
@@ -86,12 +89,12 @@ describe('Raven Metal Selenium browser suite', () => {
     }
   });
 
-  it('@smoke cookie notice can be accepted', async () => {
+  it('[SEL-002] @smoke cookie notice can be accepted', async () => {
     await open('/');
     await acceptCookieNotice();
   });
 
-  it('@smoke catalog product opens a detail page', async () => {
+  it('[SEL-003] @smoke catalog product opens a detail page', async () => {
     await open('/');
     await acceptCookieNotice();
     const product = await driver.wait(
@@ -107,7 +110,7 @@ describe('Raven Metal Selenium browser suite', () => {
     assert.match(body, /₪|ש"ח/);
   });
 
-  it('@regression event announcement opens its article', async () => {
+  it('[SEL-004] @regression event announcement opens its article', async () => {
     await open('/');
     await (await linkByText('לחצו כאן')).click();
 
@@ -117,7 +120,7 @@ describe('Raven Metal Selenium browser suite', () => {
     assert.doesNotMatch(body, /404|not found/i);
   });
 
-  it('@regression account and registration links reach their public pages', async () => {
+  it('[SEL-005] @regression account and registration links reach their public pages', async () => {
     await open('/');
     await (await linkByText('החשבון שלי')).click();
 
@@ -130,7 +133,7 @@ describe('Raven Metal Selenium browser suite', () => {
     await driver.wait(until.urlMatches(/create_account\.php/), timeout);
   });
 
-  it('@regression registration form exposes customer fields without submitting', async () => {
+  it('[SEL-006] @regression registration form exposes customer fields without submitting', async () => {
     await open('/create_account.php');
 
     assert.match(await driver.getCurrentUrl(), /create_account\.php/);
@@ -147,7 +150,7 @@ describe('Raven Metal Selenium browser suite', () => {
     );
   });
 
-  it('@regression empty cart shows no items and no payment controls', async () => {
+  it('[SEL-007] @regression empty cart shows no items and no payment controls', async () => {
     await open('/shopping_cart.php');
 
     assert.match(await driver.getCurrentUrl(), /shopping_cart\.php/);
@@ -156,7 +159,7 @@ describe('Raven Metal Selenium browser suite', () => {
     assert.doesNotMatch(body, /payment|תשלום/i);
   });
 
-  it('@regression privacy, terms, and accessibility pages load', async () => {
+  it('[SEL-008] @regression privacy, terms, and accessibility pages load', async () => {
     for (const path of ['/privacy.php', '/conditions.php', '/accessibility.php']) {
       await open(path);
       await driver.wait(until.titleContains('Raven Metal'), timeout);
